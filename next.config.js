@@ -1,27 +1,26 @@
-/** @type {import('next').NextConfig} */
+// next.config.js
+require('dotenv').config({
+  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development',
+});
 
-const whenDev = process.env.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === 'development';
 
-const getDevNextConfig = () => {
-  let mountPoint = process.env.BLOCKLET_DEV_MOUNT_POINT || '';
+const getConfig = () => {
+  const mountPoint = isDev ? process.env.BLOCKLET_DEV_MOUNT_POINT || '/' : process.env.BLOCKLET_PROD_MOUNT_POINT || '/';
 
-  let appUrl = process.env.BLOCKLET_APP_URL || '';
+  const appUrl = process.env.BLOCKLET_APP_URL || '';
 
-  let assetPrefix = `${appUrl}${mountPoint}`.replace('http://', 'https://');
+  const assetPrefix = `${appUrl}${mountPoint}`.replace('http://', 'https://');
 
-  let devWithBlockletServer = process.env.hasOwnProperty('BLOCKLET_DEV_MOUNT_POINT');
-
-  return whenDev && devWithBlockletServer
-    ? {
-        assetPrefix: assetPrefix, // When the dev mode as component, this line required
-        basePath: '',
-      }
-    : {};
+  return {
+    assetPrefix,
+    basePath: '',
+  };
 };
 
 const nextConfig = {
   reactStrictMode: false,
-  ...getDevNextConfig(),
+  ...getConfig(),
 };
 
 module.exports = nextConfig;
